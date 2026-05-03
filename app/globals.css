@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --tg-bg: var(--tg-theme-bg-color, #18222d);
+  --tg-text: var(--tg-theme-text-color, #ffffff);
+  --tg-hint: var(--tg-theme-hint-color, #708499);
+  --tg-secondary-bg: var(--tg-theme-secondary-bg-color, #232e3c);
+}
+
+* { box-sizing: border-box; }
+html { direction: rtl; }
+
+body {
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  background-color: var(--tg-bg);
+  color: var(--tg-text);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.card { background-color: var(--tg-secondary-bg); border-radius: 12px; padding: 16px; }
+.positive { color: #3dd68c; }
+.negative { color: #f4665c; }
+.hint { color: var(--tg-hint); }

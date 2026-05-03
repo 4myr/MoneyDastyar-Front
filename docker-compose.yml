@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL}"
+        CACHE_BUST: "${CACHE_BUST:-unknown}"
+    container_name: dastyar_front
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3000"
+    env_file: .env
+
+networks:
+  default:
+    name: dastyar_front

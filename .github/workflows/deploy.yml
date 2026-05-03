@@ -1,0 +1,67 @@
+name: Deploy Front
+
+run-name: Deploy ${{ github.sha }}
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass rsync
+
+      - name: Sync files
+        env:
+          SSHPASS: ${{ secrets.DEPLOY_PASS }}
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+        run: |
+          sshpass -e rsync -az --delete \
+            -e "ssh -p $PORT -o StrictHostKeyChecking=no" \
+            --exclude='.git/' \
+            --exclude='.env' \
+            --exclude='node_modules/' \
+            --exclude='.next/' \
+            --exclude='CLAUDE.md' \
+            --exclude='AGENTS.md' \
+            ./ \
+            "$USER@$HOST:~/money-dastyar/front/"
+
+      - name: Deploy
+        env:
+          SSHPASS: ${{ secrets.DEPLOY_PASS }}
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+          GIT_SHA: ${{ github.sha }}
+        run: |
+          sshpass -e ssh -p "$PORT" -o StrictHostKeyChecking=no "$USER@$HOST" \
+            "set -e && cd ~/money-dastyar/front && [ -f .env ] || cp .env.example .env && docker compose build --build-arg CACHE_BUST=$GIT_SHA && docker compose up -d --force-recreate --remove-orphans"
+
+      - name: Notify Telegram
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          JOB_STATUS: ${{ job.status }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          SHORT="${COMMIT_SHA:0:7}"
+          MSG="$(git log -1 --pretty=%B)"
+          [ "$JOB_STATUS" = "success" ] && ICON="✅" || ICON="❌"
+          TEXT="$(printf '%s Front Deploy\n\nCommit: %s\n%s' "$ICON" "$SHORT" "$MSG")"
+          curl -s \
+            --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
+            --data-urlencode "text=$TEXT" \
+            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage"
