@@ -9,7 +9,7 @@ FTP_DIR="/"
 echo "==> Building static export..."
 BUILD_OUTPUT=export \
 BASE_PATH=/dastyar \
-NEXT_PUBLIC_API_URL=https://dastyar.xenops.ir \
+NEXT_PUBLIC_API_URL=dastyar.xenops.ir \
 NEXT_PUBLIC_API_PROXY=https://amyr.ir/pr \
 npm run build
 

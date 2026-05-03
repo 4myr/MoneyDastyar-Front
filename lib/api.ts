@@ -1,20 +1,31 @@
-const BASE  = process.env.NEXT_PUBLIC_API_URL ?? '';
-const PROXY = process.env.NEXT_PUBLIC_API_PROXY ?? '';
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+const PROXY = process.env.NEXT_PUBLIC_API_PROXY ?? "";
 
-let _platform = 'telegram';
-export function setPlatform(p: string) { _platform = p; }
+let _platform = "telegram";
+export function setPlatform(p: string) {
+  _platform = p;
+}
 
 function buildUrl(path: string): string {
   const target = `${BASE}/api${path}`;
   return PROXY ? `${PROXY}/${encodeURIComponent(target)}` : target;
 }
 
-async function req<T>(method: string, path: string, initData: string, body?: unknown): Promise<T> {
+async function req<T>(
+  method: string,
+  path: string,
+  initData: string,
+  body?: unknown,
+): Promise<T> {
   const res = await fetch(buildUrl(path), {
     method,
-    headers: { 'X-Init-Data': initData, 'X-Platform': _platform, 'Content-Type': 'application/json' },
+    headers: {
+      "X-Init-Data": initData,
+      "X-Platform": PROXY ? "bale" : _platform,
+      "Content-Type": "application/json",
+    },
     body: body ? JSON.stringify(body) : undefined,
-    cache: 'no-store',
+    cache: "no-store",
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -25,23 +36,30 @@ async function req<T>(method: string, path: string, initData: string, body?: unk
 }
 
 export const apiFetch = <T>(path: string, initData: string) =>
-  req<T>('GET', path, initData);
+  req<T>("GET", path, initData);
 
 export const apiPost = <T>(path: string, initData: string, body: unknown) =>
-  req<T>('POST', path, initData, body);
+  req<T>("POST", path, initData, body);
 
 export const apiDelete = (path: string, initData: string) =>
-  req<void>('DELETE', path, initData);
+  req<void>("DELETE", path, initData);
 
 // ---- Types ----
 
 export interface Prices {
-  gold: number; silver: number; usdt: number;
-  coin_tamam: number; coin_nim: number; coin_rob: number;
+  gold: number;
+  silver: number;
+  usdt: number;
+  coin_tamam: number;
+  coin_nim: number;
+  coin_rob: number;
 }
 
 export interface SectionSummary {
-  invested: number; value: number; pnl: number; pnl_pct: number;
+  invested: number;
+  value: number;
+  pnl: number;
+  pnl_pct: number;
 }
 
 export interface SummaryData {
@@ -51,21 +69,40 @@ export interface SummaryData {
 }
 
 export interface GoldItem {
-  id: number; type: string; label: string; amount: number;
-  buy_price: number; buy_value: number; current_value: number;
-  pnl: number; pnl_pct: number; title: string; purchase_time: string;
+  id: number;
+  type: string;
+  label: string;
+  amount: number;
+  buy_price: number;
+  buy_value: number;
+  current_value: number;
+  pnl: number;
+  pnl_pct: number;
+  title: string;
+  purchase_time: string;
 }
 
 export interface CryptoItem {
-  id: number; symbol: string; title: string; amount: number;
-  buy_price_usdt: number; buy_usdt_rate: number;
-  live_price_usdt: number; usdt_rate: number;
-  buy_value: number; current_value: number;
-  pnl: number; pnl_pct: number; purchase_time: string;
+  id: number;
+  symbol: string;
+  title: string;
+  amount: number;
+  buy_price_usdt: number;
+  buy_usdt_rate: number;
+  live_price_usdt: number;
+  usdt_rate: number;
+  buy_value: number;
+  current_value: number;
+  pnl: number;
+  pnl_pct: number;
+  purchase_time: string;
 }
 
 export interface CashItem {
-  id: number; title: string; amount: number; purchase_time: string;
+  id: number;
+  title: string;
+  amount: number;
+  purchase_time: string;
 }
 
 export interface SectionData {
