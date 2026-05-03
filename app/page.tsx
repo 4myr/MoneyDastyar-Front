@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiFetch, SummaryData, SectionSummary } from '@/lib/api';
+import { apiFetch, setPlatform, SummaryData, SectionSummary } from '@/lib/api';
 import { money, pnlClass, pct } from '@/lib/format';
+import { getWebApp } from '@/lib/webapp';
 
 const SECTIONS = [
   { id: 'gold',   label: 'طلا',    icon: '🥇' },
@@ -19,13 +20,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     let initData = '';
-    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-      const tg = window.Telegram.WebApp;
-      tg.ready(); tg.expand();
-      initData = tg.initData;
+    const wa = getWebApp();
+    if (wa) {
+      wa.webapp.ready(); wa.webapp.expand();
+      setPlatform(wa.platform);
+      initData = wa.webapp.initData;
     }
     if (!initData) initData = process.env.NEXT_PUBLIC_DEV_INIT_DATA ?? '';
-    if (!initData) { setErr('لطفاً از طریق تلگرام باز کنید'); return; }
+    if (!initData) { setErr('لطفاً از طریق تلگرام یا بله باز کنید'); return; }
     apiFetch<SummaryData>('/miniapp/summary', initData).then(setData).catch(() => setErr('خطا در بارگذاری'));
   }, []);
 

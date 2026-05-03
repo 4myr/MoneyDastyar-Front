@@ -12,6 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fa" dir="rtl">
       <head>
         <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
+        <Script src="https://tapi.bale.ai/miniapp.js?3" strategy="beforeInteractive" />
       </head>
       <body>{children}</body>
     </html>

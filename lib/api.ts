@@ -1,6 +1,9 @@
 const BASE  = process.env.NEXT_PUBLIC_API_URL ?? '';
 const PROXY = process.env.NEXT_PUBLIC_API_PROXY ?? '';
 
+let _platform = 'telegram';
+export function setPlatform(p: string) { _platform = p; }
+
 function buildUrl(path: string): string {
   const target = `${BASE}/api${path}`;
   return PROXY ? `${PROXY}/${encodeURIComponent(target)}` : target;
@@ -9,7 +12,7 @@ function buildUrl(path: string): string {
 async function req<T>(method: string, path: string, initData: string, body?: unknown): Promise<T> {
   const res = await fetch(buildUrl(path), {
     method,
-    headers: { 'X-Init-Data': initData, 'Content-Type': 'application/json' },
+    headers: { 'X-Init-Data': initData, 'X-Platform': _platform, 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,
     cache: 'no-store',
   });

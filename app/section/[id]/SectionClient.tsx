@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { apiFetch, apiDelete, SectionData, GoldItem, CryptoItem, CashItem } from '@/lib/api';
+import { apiFetch, apiDelete, setPlatform, SectionData, GoldItem, CryptoItem, CashItem } from '@/lib/api';
 import { money, pnlClass, pct } from '@/lib/format';
+import { getWebApp } from '@/lib/webapp';
 import AddForm from './AddForm';
 
 const LABELS: Record<string, string> = { gold: 'طلا', silver: 'نقره', coin: 'سکه', crypto: 'کریپتو', cash: 'نقد' };
@@ -27,15 +28,16 @@ export default function SectionClient() {
 
   useEffect(() => {
     let iData = '';
-    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-      const tg = window.Telegram.WebApp;
-      tg.ready(); tg.expand();
-      tg.BackButton.show();
-      tg.BackButton.onClick(() => history.back());
-      iData = tg.initData;
+    const wa = getWebApp();
+    if (wa) {
+      wa.webapp.ready(); wa.webapp.expand();
+      wa.webapp.BackButton.show();
+      wa.webapp.BackButton.onClick(() => history.back());
+      setPlatform(wa.platform);
+      iData = wa.webapp.initData;
     }
     if (!iData) iData = process.env.NEXT_PUBLIC_DEV_INIT_DATA ?? '';
-    if (!iData) { setErr('لطفاً از طریق تلگرام باز کنید'); return; }
+    if (!iData) { setErr('لطفاً از طریق تلگرام یا بله باز کنید'); return; }
     setInitData(iData);
     load(iData);
   }, [load]);

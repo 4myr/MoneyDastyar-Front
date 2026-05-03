@@ -1,4 +1,4 @@
-interface TelegramWebApp {
+interface MiniAppWebApp {
   ready(): void;
   expand(): void;
   initData: string;
@@ -11,7 +11,8 @@ interface TelegramWebApp {
 
 declare global {
   interface Window {
-    Telegram?: { WebApp: TelegramWebApp };
+    Telegram?: { WebApp: MiniAppWebApp };
+    Bale?:     { WebApp: MiniAppWebApp };
   }
 }
 
