@@ -1,13 +1,30 @@
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
 
-export async function apiFetch<T>(path: string, initData: string): Promise<T> {
+async function req<T>(method: string, path: string, initData: string, body?: unknown): Promise<T> {
   const res = await fetch(`${BASE}/api${path}`, {
-    headers: { 'X-Init-Data': initData },
+    method,
+    headers: { 'X-Init-Data': initData, 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
     cache: 'no-store',
   });
-  if (!res.ok) throw new Error(`API error ${res.status}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`);
+  }
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
+
+export const apiFetch = <T>(path: string, initData: string) =>
+  req<T>('GET', path, initData);
+
+export const apiPost = <T>(path: string, initData: string, body: unknown) =>
+  req<T>('POST', path, initData, body);
+
+export const apiDelete = (path: string, initData: string) =>
+  req<void>('DELETE', path, initData);
+
+// ---- Types ----
 
 export interface Prices {
   gold: number; silver: number; usdt: number;
@@ -45,4 +62,15 @@ export interface CashItem {
 export interface SectionData {
   items: (GoldItem | CryptoItem | CashItem)[];
   summary: SectionSummary & { total_grams?: number; total?: number };
+}
+
+export interface AddAssetPayload {
+  category: string;
+  type?: string;
+  symbol?: string;
+  amount?: number;
+  buy_price?: number;
+  buy_usdt_rate?: number;
+  title?: string;
+  purchase_time?: string;
 }
