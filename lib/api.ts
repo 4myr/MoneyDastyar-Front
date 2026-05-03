@@ -1,7 +1,13 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
+const BASE  = process.env.NEXT_PUBLIC_API_URL ?? '';
+const PROXY = process.env.NEXT_PUBLIC_API_PROXY ?? '';
+
+function buildUrl(path: string): string {
+  const target = `${BASE}/api${path}`;
+  return PROXY ? `${PROXY}/${encodeURIComponent(target)}` : target;
+}
 
 async function req<T>(method: string, path: string, initData: string, body?: unknown): Promise<T> {
-  const res = await fetch(`${BASE}/api${path}`, {
+  const res = await fetch(buildUrl(path), {
     method,
     headers: { 'X-Init-Data': initData, 'Content-Type': 'application/json' },
     body: body ? JSON.stringify(body) : undefined,

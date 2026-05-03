@@ -65,3 +65,39 @@ jobs:
             --data-urlencode "chat_id=$TELEGRAM_CHAT_ID" \
             --data-urlencode "text=$TEXT" \
             "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage"
+
+  deploy-cpanel:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static export
+        env:
+          BUILD_OUTPUT: export
+          BASE_PATH: /dastyar
+          NEXT_PUBLIC_API_URL: https://dastyar.xenops.ir
+          NEXT_PUBLIC_API_PROXY: https://amyr.ir/pr
+        run: npm run build
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: amyr.ir
+          username: dastyar@amyr.ir
+          password: ${{ secrets.FTP_PASS }}
+          local-dir: ./out/
+          server-dir: /
+          dangerous-clean-slate: false
