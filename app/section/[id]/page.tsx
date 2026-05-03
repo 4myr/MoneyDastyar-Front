@@ -6,8 +6,6 @@ import Link from 'next/link';
 import { apiFetch, SectionData, GoldItem, CryptoItem, CashItem } from '@/lib/api';
 import { money, pnlClass, pct } from '@/lib/format';
 
-declare global { interface Window { Telegram?: { WebApp: { ready(): void; expand(): void; initData: string; BackButton: { show(): void; onClick(fn: () => void): void } } } } }
-
 const LABELS: Record<string, string> = { gold: 'طلا', silver: 'نقره', coin: 'سکه', crypto: 'کریپتو', cash: 'نقد' };
 const ICONS:  Record<string, string> = { gold: '🥇', silver: '🥈', coin: '🪙', crypto: '🔐', cash: '💵' };
 

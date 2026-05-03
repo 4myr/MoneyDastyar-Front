@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { apiFetch, SummaryData, SectionSummary } from '@/lib/api';
 import { money, pnlClass, pct } from '@/lib/format';
 
-declare global { interface Window { Telegram?: { WebApp: { ready(): void; expand(): void; initData: string } } } }
-
 const SECTIONS = [
   { id: 'gold',   label: 'طلا',    icon: '🥇' },
   { id: 'silver', label: 'نقره',   icon: '🥈' },
